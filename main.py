@@ -28,7 +28,6 @@ def process(start: int, end: int, args: argparse.Namespace) -> None:
     VIEW_URL = "https://rutracker.org/forum/"
     KEYWORD = args.game
 
-    ua = UserAgent()
     if not os.path.exists("cache"):
         os.mkdir("cache")
 
@@ -94,6 +93,8 @@ def process(start: int, end: int, args: argparse.Namespace) -> None:
 
 
 if __name__ == "__main__":
+    ua = UserAgent()
+
     parser = argparse.ArgumentParser(description='RuTracker: Native Linux Games parser')
     parser.add_argument('--game', '-g', help='A game as search query')
     parser.add_argument('--details', '-d', help='Shows more deatiled information during searching', action="store_true", default=False)
