@@ -1,6 +1,23 @@
 # Native Linux Games Parser from RuTracker
 This parser parse all native linux games and make a quick search by your query. You do not to register at RuTracker or anything, just run it
 
+## How to Run
+
+1. Clone the repository
+2. Enter the directory
+3. Create a virtual enviroment
+4. Activate it
+5. Install necessary modules 
+7. Run the python file 'main.py'
+```
+git clone https://github.com/fecton/rutracker_parser
+cd rutracker_parser
+python3 -m venv venv/
+source venv/bin/activate
+pip3 install -r requirements.txt
+./main.py -d "your_game" --help
+```
+
 ## Functionality
 
 ### Help message
