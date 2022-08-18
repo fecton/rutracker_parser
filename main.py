@@ -6,6 +6,7 @@ import sys
 import os
 import urllib3
 import re
+import psutil
 from threading import Thread
 from bs4 import BeautifulSoup as bs
 from fake_useragent import UserAgent
@@ -60,7 +61,7 @@ def process(start: int, end: int, args: argparse.Namespace) -> None:
                 link = VIEW_URL + info["href"]
 
                 full_keyword = KEYWORD.lower() in game_name.lower()
-                res = "`%s`\n%s"
+                res = "%s\n%s"
 
                 if full_keyword: # suits
                     pos = game_name.lower().find(KEYWORD.lower())
@@ -103,29 +104,38 @@ if __name__ == "__main__":
     parser.add_argument('--eword', '-e', help='Checks every single word in the game name', action="store_true", default=False)
 
     args = parser.parse_args()
+    THREADS_COUNT = psutil.cpu_count(logical=True)
 
     if not args.game:
         print("Usage: " + sys.argv[0] + " --game \"Hacknet\"")
         exit(-1)
 
+    if args.details:
+        print(f"THREADS: {THREADS_COUNT}")
 
-    th1 = Thread(target=process, args=(0,12,args))
-    th2 = Thread(target=process, args=(12,23,args))
-    th3 = Thread(target=process, args=(23,34,args))
-    th4 = Thread(target=process, args=(34,47,args))
+    try:
+        pages = int((bs(get_content("https://rutracker.org/forum/viewforum.php?f=1992"), "html.parser").find("div", id="page_content").find("td", id="main_content").find("div", id="main_content_wrap").find("td", class_="w100 vBottom pad_2").find("div").find("b").find_all("a"))[-2].text)
+    except:
+        pages = 47
 
-    th1.start()
-    th2.start()
-    th3.start()
-    th4.start()
+    threads = []
+    step = pages // THREADS_COUNT
+    start = 0
+    for i in range(THREADS_COUNT):
+        tmp = (start, start+step, args)
+        if i != THREADS_COUNT - 1:
+            threads.append(Thread(target=process, args=tmp))
+        start += step
 
-    th1.join()
-    th2.join()
-    th3.join()
-    th4.join()
+    tmp = (tmp[0], tmp[1]+(pages-step*THREADS_COUNT), args)
+    threads.append(Thread(target=process, args=tmp))
 
-    print(Back.GREEN + "Finished!" + Style.RESET_ALL)
+    for th in threads:
+        th.start()
 
+    for th in threads:
+        th.join()
 
-
+    print()
+    print(Back.GREEN + "Program finished!" + Style.RESET_ALL)
 
