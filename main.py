@@ -113,10 +113,18 @@ if __name__ == "__main__":
     if args.details:
         print(f"THREADS: {THREADS_COUNT}")
 
+    max_file = 'cache/max_page.txt'
     try:
-        pages = int((bs(get_content("https://rutracker.org/forum/viewforum.php?f=1992"), "html.parser").find("div", id="page_content").find("td", id="main_content").find("div", id="main_content_wrap").find("td", class_="w100 vBottom pad_2").find("div").find("b").find_all("a"))[-2].text)
+        if os.path.exists(max_file) and not args.icache:
+            with open(max_file) as f:
+                pages = int(f.readline())
+        else:
+            pages = int((bs(get_content("https://rutracker.org/forum/viewforum.php?f=1992"), "html.parser").find("div", id="page_content").find("td", id="main_content").find("div", id="main_content_wrap").find("td", class_="w100 vBottom pad_2").find("div").find("b").find_all("a"))[-2].text)
     except:
         pages = 47
+    finally:
+        with open(max_file, 'w') as f:
+            f.write(str(pages))
 
     threads = []
     step = pages // THREADS_COUNT
