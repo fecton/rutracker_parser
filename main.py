@@ -141,8 +141,11 @@ if __name__ == "__main__":
     for th in threads:
         th.start()
 
-    for th in threads:
-        th.join()
+    try:
+        for th in threads:
+            th.join()
+    except KeyboardInterrupt:
+        exit(0)
 
     print()
     print(Back.GREEN + "Program finished!" + Style.RESET_ALL)
